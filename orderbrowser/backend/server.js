@@ -15,17 +15,18 @@ app.post('/send-mail', async (req, res) => {
             throw new Error("Destination 'MyMailService' not found in BTP.");
         }
 
-        // 2. ROBUST CREDENTIAL CHECK (The Fix)
-        // We look for the user/pass in multiple places to be safe
-        const sUser = dest.username || dest.originalProperties.User || dest.originalProperties.user;
-        const sPass = dest.password || dest.originalProperties.Password || dest.originalProperties.password;
+        // 2. ROBUST CREDENTIAL CHECK (Updated)
+        // We now check 'mail.user' and 'mail.password' which you added in Additional Properties
+        const sUser = dest.username || dest.originalProperties['mail.user'] || dest.originalProperties.User;
+        const sPass = dest.password || dest.originalProperties['mail.password'] || dest.originalProperties.Password;
 
         console.log("Destination loaded.");
-        console.log("User found: " + (sUser ? "YES (" + sUser + ")" : "NO"));
+        console.log("User found: " + (sUser ? "YES" : "NO"));
         console.log("Password found: " + (sPass ? "YES" : "NO"));
 
         if (!sUser || !sPass) {
-            throw new Error("Credentials missing! Please check 'User' and 'Password' in BTP Cockpit.");
+            // If this fails, it sends back a clear error about what is missing
+            throw new Error("Credentials still missing! Please add 'mail.user' and 'mail.password' in BTP Additional Properties.");
         }
 
         // 3. Configure Nodemailer
