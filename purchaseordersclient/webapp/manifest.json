@@ -1,7 +1,7 @@
 {
   "_version": "1.53.0",
   "sap.app": {
-    "id": "com.sap.purchaseorderclient",
+    "id": "com.sap.purchaseordersclient",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -13,7 +13,7 @@
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
       "version": "1.20.0",
-      "toolsId": "71450201-206e-425f-b848-abc864af0a13"
+      "toolsId": "e221735b-cb95-4e2f-aaa1-993dc9909841"
     },
     "dataSources": {
       "API_PURCHASEORDER_PROCE_ANNO_MDL": {
@@ -43,10 +43,6 @@
         }
       }
     }
-  },
-  "sap.cloud": {
-    "public": true,
-    "service": "sapbtp_projects"
   },
   "sap.ui": {
     "technology": "UI5",
@@ -86,14 +82,13 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.sap.purchaseorderclient.i18n.i18n"
+          "bundleName": "com.sap.purchaseordersclient.i18n.i18n"
         }
       },
       "": {
         "dataSource": "mainService",
         "preload": true,
         "settings": {
-          "sap-client": "100",
           "defaultBindingMode": "TwoWay",
           "defaultCountMode": "Inline",
           "refreshAfterChange": false,
@@ -169,5 +164,9 @@
   "sap.fiori": {
     "registrationIds": [],
     "archeType": "transactional"
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "purchaseordersapp"
   }
 }

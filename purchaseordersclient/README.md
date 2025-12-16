@@ -1,14 +1,14 @@
 ## Application Details
 |               |
 | ------------- |
-|**Generation Date and Time**<br>Tue Dec 16 2025 06:08:10 GMT+0000 (Coordinated Universal Time)|
+|**Generation Date and Time**<br>Tue Dec 16 2025 11:35:14 GMT+0000 (Coordinated Universal Time)|
 |**App Generator**<br>SAP Fiori Application Generator|
 |**App Generator Version**<br>1.20.0|
 |**Generation Platform**<br>SAP Business Application Studio|
 |**Template Used**<br>List Report Page V2|
 |**Service Type**<br>SAP System (ABAP On-Premise)|
 |**Service URL**<br>http://s4hana23.expertsoft.in:50000/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV|
-|**Module Name**<br>purchaseorderclient|
+|**Module Name**<br>purchaseordersclient|
 |**Application Title**<br>Purchase Orders|
 |**Namespace**<br>com.sap|
 |**UI5 Theme**<br>sap_horizon|
@@ -19,7 +19,7 @@
 |**Main Entity**<br>A_PurchaseOrder|
 |**Navigation Entity**<br>to_PurchaseOrderItem|
 
-## purchaseorderclient
+## purchaseordersclient
 
 An SAP Fiori application.
 

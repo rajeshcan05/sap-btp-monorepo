@@ -1,11 +1,11 @@
 {
   "generationParameters": {
-    "generationDate": "Tue Dec 16 2025 06:08:10 GMT+0000 (Coordinated Universal Time)",
+    "generationDate": "Tue Dec 16 2025 11:35:14 GMT+0000 (Coordinated Universal Time)",
     "generatorPlatform": "SAP Business Application Studio",
     "serviceType": "SAP System (ABAP On-Premise)",
     "metadataFilename": "",
     "serviceUrl": "http://s4hana23.expertsoft.in:50000/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV",
-    "appName": "purchaseorderclient",
+    "appName": "purchaseordersclient",
     "appTitle": "Purchase Orders",
     "appDescription": "An SAP Fiori application.",
     "appNamespace": "com.sap",

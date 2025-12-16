@@ -13,23 +13,13 @@ modules:
     build-result: resources
     requires:
     - artifacts:
-      - comsappurchaseorderclient.zip
-      name: comsappurchaseorderclient
-      target-path: resources/
-    - artifacts:
       - commycompanyorderbrowser.zip
       name: commycompanyorderbrowser
       target-path: resources/
-- name: comsappurchaseorderclient
-  type: html5
-  path: purchaseorderclient
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
+    - artifacts:
+      - comsappurchaseordersclient.zip
+      name: comsappurchaseordersclient
+      target-path: resources/
 - name: commycompanyorderbrowser
   type: html5
   path: orderbrowser
@@ -70,6 +60,16 @@ modules:
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
+- name: comsappurchaseordersclient
+  type: html5
+  path: purchaseordersclient
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
 resources:
 - name: sapbtp_projects-repo-host
   type: org.cloudfoundry.managed-service
@@ -82,6 +82,15 @@ resources:
   parameters:
     config:
       HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: sapbtp_projects-destination-service

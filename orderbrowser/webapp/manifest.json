@@ -80,7 +80,8 @@
         "dataSource": "mainService",
         "preload": true,
         "settings": {
-          "sap-client": "100"
+          "sap-client": "100",
+          "useBatch": false
         }
       }
     },
