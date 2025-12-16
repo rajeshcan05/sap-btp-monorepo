@@ -44,6 +44,10 @@
       }
     }
   },
+  "sap.cloud": {
+    "public": true,
+    "service": "sapbtp_projects"
+  },
   "sap.ui": {
     "technology": "UI5",
     "icons": {
