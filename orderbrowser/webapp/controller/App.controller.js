@@ -148,37 +148,45 @@ sap.ui.define([
         },
 
         // *** THIS IS THE UPDATED FUNCTION FOR AUTOMATIC EMAIL ***
-        // UPDATED: Now includes CSRF Token fetching to fix 403 Forbidden Error
         onAISend: function() {
             var oModel = this.getView().getModel("appView");
             var sEmail = oModel.getProperty("/emailTo");
             var sSubject = oModel.getProperty("/emailTopic");
             var sBody = oModel.getProperty("/aiOutputText");
 
-            // Validation
-            if(!sEmail){
-                MessageToast.show("Please enter a recipient email address.");
+            // 1. Validation
+            if (!sEmail) {
+                sap.m.MessageToast.show("Please enter a recipient email address.");
                 return;
             }
 
             var oDialog = this.byId("aiDialog");
             oDialog.setBusy(true);
 
-            // 1. GET CSRF TOKEN 
-            // We ask the main OData model for the security token.
-            // If it's available, we add it to the headers.
+            // 2. DYNAMIC URL CALCULATION (Fixes the Path Issue)
+            // This ensures we hit the app's folder, not the Launchpad root.
+            var sAppModulePath = sap.ui.require.toUrl("com/mycompany/orderbrowser");
+            // Remove any trailing slash to avoid double slashes
+            if (sAppModulePath.endsWith("/")) {
+                sAppModulePath = sAppModulePath.slice(0, -1);
+            }
+            var sBackendUrl = sAppModulePath + "/send-mail";
+            
+            console.log("Sending email to:", sBackendUrl); // Check console (F12) to see the real URL
+
+            // 3. GET CSRF TOKEN (Fixes the 403 Forbidden Issue)
             var sToken = null;
             if (this.getView().getModel() && this.getView().getModel().getSecurityToken) {
                 sToken = this.getView().getModel().getSecurityToken();
             }
 
-            // 2. SEND AJAX WITH TOKEN
+            // 4. SEND REQUEST
             jQuery.ajax({
-                url: "/send-mail",
+                url: sBackendUrl,
                 type: "POST",
                 contentType: "application/json",
                 headers: {
-                    "X-Csrf-Token": sToken // <--- Attaching the token here fixes the 403 error
+                    "X-Csrf-Token": sToken 
                 },
                 data: JSON.stringify({
                     to: sEmail,
@@ -187,7 +195,7 @@ sap.ui.define([
                 }),
                 success: function() {
                     oDialog.setBusy(false);
-                    MessageToast.show("Email sent successfully via system!");
+                    sap.m.MessageToast.show("Email sent successfully!");
                     oDialog.close();
                 },
                 error: function(oError) {
@@ -195,17 +203,16 @@ sap.ui.define([
                     var sMsg = "Unknown error";
                     if (oError.responseText) {
                         try {
-                            // Try to parse JSON error if available
-                            sMsg = JSON.parse(oError.responseText).error || oError.responseText;
-                        } catch(e) {
+                            var oBody = JSON.parse(oError.responseText);
+                            sMsg = oBody.error || oBody.message || oError.responseText;
+                        } catch (e) {
                             sMsg = oError.responseText;
                         }
                     }
-                    MessageBox.error("Failed to send email.\nReason: " + sMsg);
+                    sap.m.MessageBox.error("Failed to send email.\nURL: " + sBackendUrl + "\nReason: " + sMsg);
                 }
             });
         },
-
         onAICancel: function() {
             this._stopGeneration();
             this.byId("aiDialog").close();
