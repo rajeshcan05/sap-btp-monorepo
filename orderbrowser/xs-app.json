@@ -3,6 +3,13 @@
   "authenticationMethod": "route",
   "routes": [
     {
+      "source": "^/send-mail(.*)$",
+      "target": "/send-mail$1",
+      "destination": "mailer-backend",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
       "source": "^/sap/(.*)$",
       "target": "/sap/$1",
       "destination": "P23_S4HANA",

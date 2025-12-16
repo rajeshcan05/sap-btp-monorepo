@@ -1,0 +1,15 @@
+{
+  "name": "mailer-backend",
+  "version": "1.0.0",
+  "description": "Simple mailer service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.7",
+    "@sap-cloud-sdk/connectivity": "^3.0.0",
+    "@sap-cloud-sdk/http-client": "^3.0.0"
+  }
+}

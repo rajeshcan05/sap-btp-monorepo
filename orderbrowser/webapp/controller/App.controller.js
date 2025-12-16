@@ -50,11 +50,10 @@ sap.ui.define([
         },
 
         // ============================================================
-        // AI INTEGRATION LOGIC (Refined)
+        // AI INTEGRATION LOGIC
         // ============================================================
 
         onOpenAIDialog: function() {
-            // 1. Get the current binding context of the DETAIL PAGE
             var oDetail = this.byId("detail");
             var oContext = oDetail.getBindingContext();
 
@@ -66,20 +65,16 @@ sap.ui.define([
             var sPO = oContext.getProperty("PurchaseOrder");
             var sVendor = oContext.getProperty("Supplier");
             
-            // 2. Set Dynamic Data into Model
             var oModel = this.getView().getModel("appView");
-            oModel.setProperty("/emailTo", ""); // Clear previous email
+            oModel.setProperty("/emailTo", ""); 
             oModel.setProperty("/emailTopic", "Inquiry regarding Order " + sPO + " - " + sVendor);
             
-            // Store these for the AI generator to use
             oModel.setProperty("/activePO", sPO);
             oModel.setProperty("/activeVendor", sVendor);
 
-            // Reset AI State
             oModel.setProperty("/aiState", "generate");
             oModel.setProperty("/aiOutputText", "");
 
-            // 3. Open Dialog
             var oDialog = this.byId("aiDialog");
             oDialog.open();
         },
@@ -106,7 +101,6 @@ sap.ui.define([
             var sVendor = oModel.getProperty("/activeVendor");
             var sUser = oModel.getProperty("/currentUserName");
 
-            // 4. Generate RELEVANT Content
             var sFullText = "Dear " + sVendor + ",\n\nI am writing to inquire about the status of Purchase Order #" + sPO + ".\n\nWe would like to confirm the expected delivery date for the line items listed in this order. Please let us know if there are any delays or updates we should be aware of.\n\nThank you for your prompt assistance.\n\nBest regards,\n" + sUser;
             
             var aWords = sFullText.split("");
@@ -121,7 +115,7 @@ sap.ui.define([
                 } else {
                     that._stopGeneration();
                 }
-            }, 25); // Faster typing speed
+            }, 25); 
         },
 
         _stopGeneration: function() {
@@ -150,32 +144,54 @@ sap.ui.define([
 
         onMenuAction: function(oEvent) {
             MessageToast.show("Revising text...");
-            // In a real app, you would send a new prompt to the AI here.
-            // For now, we just restart the effect.
             this._startGeneration(); 
         },
 
+        // *** THIS IS THE UPDATED FUNCTION FOR AUTOMATIC EMAIL ***
         onAISend: function() {
-    // 1. Get the data from the AI Dialog
             var oModel = this.getView().getModel("appView");
             var sEmail = oModel.getProperty("/emailTo");
             var sSubject = oModel.getProperty("/emailTopic");
             var sBody = oModel.getProperty("/aiOutputText");
 
-            // 2. Validation
+            // Validation
             if(!sEmail){
                 MessageToast.show("Please enter a recipient email address.");
                 return;
             }
 
-            // 3. TRIGGER THE EMAIL
-            // This opens your default mail app (Outlook/Gmail) with the AI text ready to send.
-            // sap.m.URLHelper handles the formatting and new lines automatically.
-            sap.m.URLHelper.triggerEmail(sEmail, sSubject, sBody);
+            var oDialog = this.byId("aiDialog");
+            oDialog.setBusy(true);
 
-            // 4. Close the dialog
-            MessageToast.show("Opening your email client...");
-            this.byId("aiDialog").close();
+            // Send via AJAX to your Node.js backend
+            jQuery.ajax({
+                url: "/send-mail",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    to: sEmail,
+                    subject: sSubject,
+                    text: sBody
+                }),
+                success: function() {
+                    oDialog.setBusy(false);
+                    MessageToast.show("Email sent successfully via system!");
+                    oDialog.close();
+                },
+                error: function(oError) {
+                    oDialog.setBusy(false);
+                    var sMsg = "Unknown error";
+                    if (oError.responseText) {
+                        try {
+                            // Try to parse JSON error if available
+                            sMsg = JSON.parse(oError.responseText).error || oError.responseText;
+                        } catch(e) {
+                            sMsg = oError.responseText;
+                        }
+                    }
+                    MessageBox.error("Failed to send email.\nReason: " + sMsg);
+                }
+            });
         },
 
         onAICancel: function() {
@@ -229,7 +245,7 @@ sap.ui.define([
         },
 
         // ============================================================
-        // STANDARD LOGIC (Splitter, Sort, Search)
+        // STANDARD LOGIC
         // ============================================================
 
         onSelectionChange: function (oEvent) {

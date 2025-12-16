@@ -20,6 +20,7 @@ modules:
       - comsappurchaseordersclient.zip
       name: comsappurchaseordersclient
       target-path: resources/
+
 - name: commycompanyorderbrowser
   type: html5
   path: orderbrowser
@@ -30,6 +31,20 @@ modules:
     - npm install
     - npm run build:cf
     supported-platforms: []
+
+- name: mailer-backend
+  type: nodejs
+  path: orderbrowser/backend  # <--- Note the path! It looks inside orderbrowser
+  parameters:
+    memory: 128M
+    disk-quota: 256M
+  provides:
+    - name: mailer-api
+      properties:
+        url: ${default-url}
+  requires:
+    - name: sapbtp_projects-destination-service
+
 - name: sapbtp_projects-destination-content
   type: com.sap.application.content
   requires:
@@ -60,6 +75,7 @@ modules:
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
+
 - name: comsappurchaseordersclient
   type: html5
   path: purchaseordersclient
@@ -70,6 +86,7 @@ modules:
     - npm install
     - npm run build:cf
     supported-platforms: []
+
 resources:
 - name: sapbtp_projects-repo-host
   type: org.cloudfoundry.managed-service
@@ -77,6 +94,7 @@ resources:
     service: html5-apps-repo
     service-name: sapbtp_projects-html5-service
     service-plan: app-host
+
 - name: sapbtp_projects-destination-service
   type: org.cloudfoundry.managed-service
   parameters:
@@ -90,11 +108,24 @@ resources:
             ProxyType: Internet
             Type: HTTP
             URL: https://ui5.sap.com
+          # --- NEW DESTINATION FOR EMAIL ---
+          - Authentication: NoAuthentication
+            Name: mailer-backend
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{mailer-api/url}
+            HTML5.ForwardAuthToken: true
+          # ---------------------------------
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: sapbtp_projects-destination-service
     service-plan: lite
+  # --- REQUIRED TO FIND BACKEND URL ---
+  requires:
+    - name: mailer-api
+  # ------------------------------------
+
 - name: uaa_sapbtp_projects
   type: org.cloudfoundry.managed-service
   parameters:
@@ -102,6 +133,7 @@ resources:
     service: xsuaa
     service-name: sapbtp_projects-xsuaa-service
     service-plan: application
+
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
