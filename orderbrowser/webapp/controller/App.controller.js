@@ -148,6 +148,7 @@ sap.ui.define([
         },
 
         // *** THIS IS THE UPDATED FUNCTION FOR AUTOMATIC EMAIL ***
+        // UPDATED: Now includes CSRF Token fetching to fix 403 Forbidden Error
         onAISend: function() {
             var oModel = this.getView().getModel("appView");
             var sEmail = oModel.getProperty("/emailTo");
@@ -163,11 +164,22 @@ sap.ui.define([
             var oDialog = this.byId("aiDialog");
             oDialog.setBusy(true);
 
-            // Send via AJAX to your Node.js backend
+            // 1. GET CSRF TOKEN 
+            // We ask the main OData model for the security token.
+            // If it's available, we add it to the headers.
+            var sToken = null;
+            if (this.getView().getModel() && this.getView().getModel().getSecurityToken) {
+                sToken = this.getView().getModel().getSecurityToken();
+            }
+
+            // 2. SEND AJAX WITH TOKEN
             jQuery.ajax({
                 url: "/send-mail",
                 type: "POST",
                 contentType: "application/json",
+                headers: {
+                    "X-Csrf-Token": sToken // <--- Attaching the token here fixes the 403 error
+                },
                 data: JSON.stringify({
                     to: sEmail,
                     subject: sSubject,
