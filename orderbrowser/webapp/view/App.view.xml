@@ -1,0 +1,199 @@
+<mvc:View
+    controllerName="com.mycompany.orderbrowser.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    displayBlock="true"
+    height="100%">
+
+    <l:Splitter height="100%" width="100%">
+
+        <l:contentAreas>
+            <Page id="master" title="Orders">
+                <layoutData>
+                    <l:SplitterLayoutData size="{appView>/masterSize}" minSize="0px" resizable="true"/>
+                </layoutData>
+                <headerContent>
+                    <Button icon="sap-icon://sort" press=".onSort" />
+                </headerContent>
+                <subHeader>
+                    <Bar>
+                        <contentMiddle>
+                            <SearchField search=".onSearch" width="100%" />
+                        </contentMiddle>
+                    </Bar>
+                </subHeader>
+                <content>
+                    <List
+                        id="list"
+                        items="{
+                            path: '/A_PurchaseOrder',
+                            sorter: { path: 'PurchaseOrder', descending: true }
+                        }"
+                        growing="true"
+                        growingThreshold="20"
+                        growingScrollToLoad="true"
+                        mode="SingleSelectMaster"
+                        selectionChange=".onSelectionChange">
+                        <ObjectListItem
+                            title="{PurchaseOrder}"
+                            type="Active"
+                            press=".onSelectionChange"
+                            number="{
+                                parts: [{path: 'TotalNetAmount'}, {path: 'TransactionCurrency'}],
+                                type: 'sap.ui.model.type.Currency',
+                                formatOptions: {showMeasure: false}
+                            }"
+                            numberUnit="{TransactionCurrency}">
+                            <attributes>
+                                <ObjectAttribute text="{Supplier}" />
+                            </attributes>
+                            <firstStatus>
+                                <ObjectStatus
+                                    text="{PurchaseOrderType}"
+                                    state="{= ${TotalNetAmount} > 5000 ? 'Warning' : 'Success' }" />
+                            </firstStatus>
+                        </ObjectListItem>
+                    </List>
+                </content>
+            </Page>
+
+            <Page id="detail" title="{PurchaseOrder}" showNavButton="false">
+                
+                <headerContent>
+                    <Button 
+                        icon="sap-icon://email" 
+                        text="AI Draft" 
+                        type="Transparent" 
+                        press=".onOpenAIDialog" 
+                        tooltip="Draft Email with AI" />
+                    
+                    <Button icon="sap-icon://full-screen" visible="{= !${appView>/isFullScreen} }" press=".onFullScreen" />
+                    <Button icon="sap-icon://exit-full-screen" visible="{= ${appView>/isFullScreen} }" press=".onExitFullScreen" />
+                    <Button icon="sap-icon://decline" press=".onCloseDetail" />
+                </headerContent>
+
+                <content>
+                    <ObjectHeader
+                        binding="{path:'/A_PurchaseOrder'}"
+                        title="Order {PurchaseOrder}"
+                        intro="{Supplier}"
+                        responsive="true"
+                        fullScreenOptimized="true"
+                        number="{
+                            parts: [{path: 'TotalNetAmount'}, {path: 'TransactionCurrency'}],
+                            type: 'sap.ui.model.type.Currency'
+                        }"
+                        numberUnit="{TransactionCurrency}">
+                        <statuses>
+                            <ObjectStatus text="{PurchaseOrderType}" state="Success" />
+                        </statuses>
+                    </ObjectHeader>
+
+                    <IconTabBar class="sapUiResponsiveContentPadding">
+                        <items>
+                            <IconTabFilter icon="sap-icon://shipping-status" iconColor="Positive" text="Shipping">
+                                <form:SimpleForm editable="false" layout="ResponsiveGridLayout">
+                                    <form:content>
+                                        <Label text="Name" />
+                                        <Text text="{Supplier} (Mock Data)" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </IconTabFilter>
+                            <IconTabFilter icon="sap-icon://employee" text="Processor">
+                                <form:SimpleForm editable="false" layout="ResponsiveGridLayout">
+                                    <form:content>
+                                        <Label text="Created By" />
+                                        <Text text="{CreatedByUser}" />
+                                    </form:content>
+                                </form:SimpleForm>
+                            </IconTabFilter>
+                        </items>
+                    </IconTabBar>
+
+                    <Table
+                        id="lineItemsList"
+                        items="{to_PurchaseOrderItem}"
+                        width="auto"
+                        growing="true"
+                        growingThreshold="20"
+                        growingScrollToLoad="true"
+                        class="sapUiResponsiveMargin">
+                        
+                        <headerToolbar>
+                            <Toolbar>
+                                <Title text="Line Items" level="H2"/>
+                                <ToolbarSpacer />
+                                <Button text="Push Changes" icon="sap-icon://upload" type="Emphasized" press=".onPushChanges" />
+                            </Toolbar>
+                        </headerToolbar>
+                        
+                        <columns>
+                            <Column><Text text="Product" /></Column>
+                            <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Plant" /></Column>
+                            <Column hAlign="End"><Text text="Price" /></Column>
+                            <Column hAlign="Center" width="15%"><Text text="Quantity" /></Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <ObjectIdentifier title="{Material}" text="{PurchaseOrderItem}"/>
+                                    <Text text="{Plant}" />
+                                    <ObjectNumber number="{NetPriceAmount}" unit="{DocumentCurrency}" />
+                                    <Input value="{OrderQuantity}" type="Number" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </content>
+            </Page>
+        </l:contentAreas>
+    </l:Splitter>
+
+    <Dialog id="aiDialog" title="Seamless AI Integration" contentWidth="550px" contentHeight="650px">
+        <content>
+            <VBox class="sapUiSmallMargin">
+                
+                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Avatar src="" initials="{appView>/currentUserInitials}" displaySize="M" class="sapUiSmallMarginEnd"/>
+                    <VBox>
+                        <Title text="{appView>/currentUserName}" level="H4"/>
+                        <Text text="Purchasing Manager" class="sapUiTinyMarginTop"/>
+                    </VBox>
+                </HBox>
+
+                <Label text="To:" required="true" class="sapUiTinyMarginTop"/>
+                <Input value="{appView>/emailTo}" placeholder="Enter recipient email..." width="100%"/>
+
+                <Label text="Topic:" required="true" class="sapUiSmallMarginTop"/>
+                <Input value="{appView>/emailTopic}" editable="false" width="100%"/>
+
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiMediumMarginTop">
+                    <Label text="Generated Content:" design="Bold"/>
+                    <Button 
+                        id="btnGenerate"
+                        text="{= ${appView>/aiState} === 'generate' ? 'Generate' : (${appView>/aiState} === 'generating' ? 'Stop Generating' : 'Revise') }" 
+                        icon="{= ${appView>/aiState} === 'generating' ? 'sap-icon://stop' : 'sap-icon://ai' }"
+                        type="{= ${appView>/aiState} === 'generating' ? 'Reject' : 'Emphasized' }"
+                        press=".onAIButtonPress">
+                    </Button>
+                </HBox>
+
+                <TextArea 
+                    id="aiOutput" 
+                    value="{appView>/aiOutputText}" 
+                    rows="12" 
+                    width="100%" 
+                    enabled="{= ${appView>/aiState} !== 'generating' }"
+                    class="sapUiTinyMarginTop"/>
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="Send Email" type="Emphasized" press=".onAISend" enabled="{= ${appView>/aiState} === 'revise' }" />
+            <Button text="Cancel" press=".onAICancel" />
+        </buttons>
+    </Dialog>
+
+</mvc:View>

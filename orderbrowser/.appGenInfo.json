@@ -1,0 +1,24 @@
+{
+  "generationParameters": {
+    "generationDate": "Tue Dec 16 2025 06:25:48 GMT+0000 (Coordinated Universal Time)",
+    "generatorPlatform": "SAP Business Application Studio",
+    "serviceType": "SAP System (ABAP On-Premise)",
+    "metadataFilename": "",
+    "serviceUrl": "http://s4hana23.expertsoft.in:50000/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV",
+    "appName": "orderbrowser",
+    "appTitle": "App Title",
+    "appDescription": "An SAP Fiori application.",
+    "appNamespace": "com.mycompany",
+    "ui5Theme": "sap_horizon",
+    "ui5Version": "1.114.14",
+    "enableCodeAssist": false,
+    "enableEslint": false,
+    "enableTypeScript": false,
+    "showMockDataInfo": true,
+    "generatorVersion": "1.20.0",
+    "template": "Basic V2",
+    "generatorName": "SAP Fiori Application Generator",
+    "entityRelatedConfig": [],
+    "launchText": "To launch the generated application, run the following from the generated application root folder:\n\n```\n    npm start\n```"
+  }
+}

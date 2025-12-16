@@ -1,0 +1,33 @@
+{
+  "generationParameters": {
+    "generationDate": "Tue Dec 16 2025 06:08:10 GMT+0000 (Coordinated Universal Time)",
+    "generatorPlatform": "SAP Business Application Studio",
+    "serviceType": "SAP System (ABAP On-Premise)",
+    "metadataFilename": "",
+    "serviceUrl": "http://s4hana23.expertsoft.in:50000/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV",
+    "appName": "purchaseorderclient",
+    "appTitle": "Purchase Orders",
+    "appDescription": "An SAP Fiori application.",
+    "appNamespace": "com.sap",
+    "ui5Theme": "sap_horizon",
+    "ui5Version": "1.114.14",
+    "enableCodeAssist": false,
+    "enableEslint": false,
+    "enableTypeScript": false,
+    "showMockDataInfo": true,
+    "generatorVersion": "1.20.0",
+    "template": "List Report Page V2",
+    "generatorName": "SAP Fiori Application Generator",
+    "entityRelatedConfig": [
+      {
+        "type": "Main Entity",
+        "value": "A_PurchaseOrder"
+      },
+      {
+        "type": "Navigation Entity",
+        "value": "to_PurchaseOrderItem"
+      }
+    ],
+    "launchText": "To launch the generated application, run the following from the generated application root folder:\n\n```\n    npm start\n```"
+  }
+}

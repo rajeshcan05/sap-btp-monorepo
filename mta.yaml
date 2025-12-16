@@ -1,0 +1,98 @@
+_schema-version: "3.2"
+ID: sapbtp_projects
+version: 0.0.1
+modules:
+- name: sapbtp_projects-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: sapbtp_projects-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - comsappurchaseorderclient.zip
+      name: comsappurchaseorderclient
+      target-path: resources/
+    - artifacts:
+      - commycompanyorderbrowser.zip
+      name: commycompanyorderbrowser
+      target-path: resources/
+- name: comsappurchaseorderclient
+  type: html5
+  path: purchaseorderclient
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: commycompanyorderbrowser
+  type: html5
+  path: orderbrowser
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: sapbtp_projects-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: sapbtp_projects-destination-service
+    parameters:
+      content-target: true
+  - name: sapbtp_projects-repo-host
+    parameters:
+      service-key:
+        name: sapbtp_projects-repo-host-key
+  - name: uaa_sapbtp_projects
+    parameters:
+      service-key:
+        name: uaa_sapbtp_projects-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: purchaseordersapp_sapbtp_projects_repo_host
+          ServiceInstanceName: sapbtp_projects-html5-service
+          ServiceKeyName: sapbtp_projects-repo-host-key
+          sap.cloud.service: purchaseordersapp
+        - Authentication: OAuth2UserTokenExchange
+          Name: purchaseordersapp_uaa_sapbtp_projects
+          ServiceInstanceName: sapbtp_projects-xsuaa-service
+          ServiceKeyName: uaa_sapbtp_projects-key
+          sap.cloud.service: purchaseordersapp
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+resources:
+- name: sapbtp_projects-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: sapbtp_projects-html5-service
+    service-plan: app-host
+- name: sapbtp_projects-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      version: 1.0.0
+    service: destination
+    service-name: sapbtp_projects-destination-service
+    service-plan: lite
+- name: uaa_sapbtp_projects
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: sapbtp_projects-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
