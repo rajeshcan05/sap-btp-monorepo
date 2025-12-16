@@ -7,40 +7,48 @@ app.use(express.json());
 
 app.post('/send-mail', async (req, res) => {
     try {
-        console.log("Attempting to send email (CLOUD MODE)...");
+        console.log("--- Email Request Started ---");
 
-        // 1. GET CREDENTIALS FROM BTP DESTINATION
-        // This securely fetches the User and Password you saved in BTP Cockpit
+        // 1. Fetch Destination
         const dest = await getDestination({ destinationName: "MyMailService" });
-
         if (!dest) {
-            throw new Error("Destination 'MyMailService' not found. Check BTP Cockpit.");
+            throw new Error("Destination 'MyMailService' not found in BTP.");
         }
 
-        console.log("Destination found. Sending as:", dest.username);
+        // 2. ROBUST CREDENTIAL CHECK (The Fix)
+        // We look for the user/pass in multiple places to be safe
+        const sUser = dest.username || dest.originalProperties.User || dest.originalProperties.user;
+        const sPass = dest.password || dest.originalProperties.Password || dest.originalProperties.password;
 
-        // 2. CONFIGURE NODEMAILER
-        // We use the properties from the destination (host, port, user, pass)
+        console.log("Destination loaded.");
+        console.log("User found: " + (sUser ? "YES (" + sUser + ")" : "NO"));
+        console.log("Password found: " + (sPass ? "YES" : "NO"));
+
+        if (!sUser || !sPass) {
+            throw new Error("Credentials missing! Please check 'User' and 'Password' in BTP Cockpit.");
+        }
+
+        // 3. Configure Nodemailer
         let transporter = nodemailer.createTransport({
             host: dest.originalProperties['mail.smtp.host'] || 'smtp.gmail.com',
             port: dest.originalProperties['mail.smtp.port'] || 587,
             secure: false, 
             auth: {
-                user: dest.username, 
-                pass: dest.password  // <--- Automatically filled by BTP
+                user: sUser, 
+                pass: sPass 
             },
             tls: { rejectUnauthorized: false }
         });
 
-        // 3. SEND EMAIL
+        // 4. Send Email
         let info = await transporter.sendMail({
-            from: `"Order Browser AI" <${dest.username}>`, 
+            from: `"Order Browser AI" <${sUser}>`, 
             to: req.body.to,
             subject: req.body.subject,
             text: req.body.text
         });
 
-        console.log("Message sent: %s", info.messageId);
+        console.log("Email sent successfully. ID: %s", info.messageId);
         res.status(200).send("Email sent successfully.");
 
     } catch (error) {
