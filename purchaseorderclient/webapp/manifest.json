@@ -93,6 +93,7 @@
         "dataSource": "mainService",
         "preload": true,
         "settings": {
+          "sap-client": "100",
           "defaultBindingMode": "TwoWay",
           "defaultCountMode": "Inline",
           "refreshAfterChange": false,

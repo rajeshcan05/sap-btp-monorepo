@@ -79,7 +79,9 @@
       "": {
         "dataSource": "mainService",
         "preload": true,
-        "settings": {}
+        "settings": {
+          "sap-client": "100"
+        }
       }
     },
     "resources": {
